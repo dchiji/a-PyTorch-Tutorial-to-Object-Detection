@@ -341,6 +341,7 @@ class SSD300(nn.Module):
 
         # Prior boxes
         self.priors_cxcy = self.create_prior_boxes()
+        self.priors_cxcy.requires_grad = False
 
     def forward(self, image):
         """
@@ -541,6 +542,8 @@ class MultiBoxLoss(nn.Module):
     def __init__(self, priors_cxcy, threshold=0.5, neg_pos_ratio=3, alpha=1.):
         super(MultiBoxLoss, self).__init__()
         self.priors_cxcy = priors_cxcy
+        self.priors_cxcy.requires_grad = False
+
         self.priors_xy = cxcy_to_xy(priors_cxcy)
         self.threshold = threshold
         self.neg_pos_ratio = neg_pos_ratio
