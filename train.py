@@ -6,6 +6,7 @@ from model import SSD300, MultiBoxLoss
 from datasets import PascalVOCDataset
 from utils import *
 import matplotlib.pyplot as plt
+from IPython.display import display, clear_output
 
 # Data parameters
 data_folder = './data'  # folder with data files
@@ -81,6 +82,8 @@ def main():
                                              collate_fn=val_dataset.collate_fn, num_workers=workers,
                                              pin_memory=True)
 
+    plt.ion()
+    fig = plt.figure()
     train_losses = []
     val_losses = []
 
@@ -126,8 +129,11 @@ def main():
 
         # Save checkpoint
         save_checkpoint(epoch, epochs_since_improvement, model, optimizer, val_loss, best_loss, is_best)
+        plt.cla()
+        plt.ylim(0,8)
         plt.plot(train_losses)
         plt.plot(val_losses)
+        display(fig)
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
