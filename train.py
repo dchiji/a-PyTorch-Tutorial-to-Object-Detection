@@ -5,6 +5,7 @@ import torch.utils.data
 from model import SSD300, MultiBoxLoss
 from datasets import PascalVOCDataset
 from utils import *
+import matplotlib.pyplot as plt
 
 # Data parameters
 data_folder = './data'  # folder with data files
@@ -79,6 +80,10 @@ def main():
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=batch_size, shuffle=True,
                                              collate_fn=val_dataset.collate_fn, num_workers=workers,
                                              pin_memory=True)
+
+    train_losses = []
+    val_losses = []
+
     # Epochs
     for epoch in range(start_epoch, epochs):
         # Paper describes decaying the learning rate at the 80000th, 100000th, 120000th 'iteration', i.e. model update or batch
@@ -94,7 +99,7 @@ def main():
         # and have adjust_learning_rate(optimizer, 0.1) BEFORE this 'for' loop
 
         # One epoch's training
-        train(train_loader=train_loader,
+        train_loss = train(train_loader=train_loader,
               model=model,
               criterion=criterion,
               optimizer=optimizer,
@@ -104,6 +109,9 @@ def main():
         val_loss = validate(val_loader=val_loader,
                             model=model,
                             criterion=criterion)
+
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
 
         # Did validation loss improve?
         is_best = val_loss < best_loss
@@ -118,6 +126,8 @@ def main():
 
         # Save checkpoint
         save_checkpoint(epoch, epochs_since_improvement, model, optimizer, val_loss, best_loss, is_best)
+        plt.plot(train_losses)
+        plt.plot(val_losses)
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -178,6 +188,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
                                                                   batch_time=batch_time,
                                                                   data_time=data_time, loss=losses))
     del predicted_locs, predicted_scores, images, boxes, labels  # free some memory since their histories may be stored
+    return losses.avg
 
 
 def validate(val_loader, model, criterion):
