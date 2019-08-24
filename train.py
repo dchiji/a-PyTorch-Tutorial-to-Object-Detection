@@ -73,7 +73,7 @@ def main():
                                     lr=lr, momentum=momentum, weight_decay=weight_decay)
         elif optim_type == 'adam':
             optimizer = torch.optim.Adam(params=[{'params': biases, 'lr': 2 * lr}, {'params': not_biases}],
-                                    lr=lr, momentum=momentum, weight_decay=weight_decay)
+                                    lr=lr, weight_decay=weight_decay)
         else:
             assert False, "The option --optim_type='%s' is invalid." % optim_type
 
