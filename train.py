@@ -40,7 +40,7 @@ def main():
     parser.add_argument("--grad_clip", type=float, help="weight decay", default=None)
     args = parser.parse_args()
 
-    batch_size = args.batch_size
+    batch_size = args.batch
     checkpoint = args.checkpoint
     epochs = args.epochs
     lr = args.lr
