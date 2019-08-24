@@ -119,7 +119,8 @@ def main():
               model=model,
               criterion=criterion,
               optimizer=optimizer,
-              epoch=epoch)
+              epoch=epoch,
+              grad_clip=grad_clip)
 
         # One epoch's validation
         val_loss = validate(val_loader=val_loader,
@@ -149,7 +150,7 @@ def main():
         display(fig)
 
 
-def train(train_loader, model, criterion, optimizer, epoch):
+def train(train_loader, model, criterion, optimizer, epoch, grad_clip):
     """
     One epoch's training.
 
