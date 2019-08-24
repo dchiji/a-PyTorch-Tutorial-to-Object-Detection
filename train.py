@@ -5,8 +5,10 @@ import torch.utils.data
 from model import SSD300, MultiBoxLoss
 from datasets import PascalVOCDataset
 from utils import *
+
 import matplotlib.pyplot as plt
 from IPython.display import display, clear_output
+import argparse
 
 # Data parameters
 data_folder = './data'  # folder with data files
@@ -18,18 +20,6 @@ n_classes = len(label_map)  # number of different types of objects
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Learning parameters
-checkpoint = None  # path to model checkpoint, None if none
-batch_size = 8  # batch size
-start_epoch = 0  # start at this epoch
-epochs = 200  # number of epochs to run without early-stopping
-epochs_since_improvement = 0  # number of epochs since there was an improvement in the validation metric
-best_loss = 100.  # assume a high loss at first
-workers = 4  # number of workers for loading data in the DataLoader
-print_freq = 200  # print training or validation status every __ batches
-lr = 1e-3  # learning rate
-momentum = 0.9  # momentum
-weight_decay = 5e-4  # weight decay
-grad_clip = None  # clip if gradients are exploding, which may happen at larger batch sizes (sometimes at 32) - you will recognize it by a sorting error in the MuliBox loss calculation
 
 cudnn.benchmark = True
 
@@ -38,7 +28,30 @@ def main():
     """
     Training and validation.
     """
-    global epochs_since_improvement, start_epoch, label_map, best_loss, epoch, checkpoint
+    global label_map
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--batch", type=int, help="batch size", default=8)
+    parser.add_argument("--checkpoint", type=str, help="path to model checkpoint", default=None)
+    parser.add_argument("--epochs", type=int, help="number of epochs", default=200)
+    parser.add_argument("--lr", type=float, help="learning rate", default=1e-3)
+    parser.add_argument("--momentum", type=float, help="momentum", default=0.9)
+    parser.add_argument("--weight_decay", type=float, help="weight decay", default=5e-4)
+    parser.add_argument("--grad_clip", type=float, help="weight decay", default=None)
+    args = parser.parse_args()
+
+    batch_size = args.batch_size
+    checkpoint = args.checkpoint
+    epochs = args.epochs
+    lr = args.lr
+    momentum = args.momentum
+    weight_decay = args.weight_decay
+    grad_clip = args.grad_clip
+
+    start_epoch = 0
+    epochs_since_improvement = 0
+    best_loss = 100.
+    workers = 4
 
     # Initialize model or load checkpoint
     if checkpoint is None:
