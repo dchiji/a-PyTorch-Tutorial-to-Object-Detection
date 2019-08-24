@@ -19,8 +19,7 @@ keep_difficult = True  # use objects considered difficult to detect?
 n_classes = len(label_map)  # number of different types of objects
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Learning parameters
-
+print_freq = 200
 cudnn.benchmark = True
 
 
