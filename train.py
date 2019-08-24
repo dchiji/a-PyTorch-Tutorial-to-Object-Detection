@@ -36,7 +36,8 @@ def main():
     parser.add_argument("--lr", type=float, help="learning rate", default=1e-3)
     parser.add_argument("--momentum", type=float, help="momentum", default=0.9)
     parser.add_argument("--weight_decay", type=float, help="weight decay", default=5e-4)
-    parser.add_argument("--grad_clip", type=float, help="weight decay", default=None)
+    parser.add_argument("--grad_clip", type=float, help="gradient clipping by this value", default=None)
+    parser.add_argument("--optim_type", type=str, help="select optimizer", default="sgd")
     args = parser.parse_args()
 
     batch_size = args.batch
@@ -46,6 +47,7 @@ def main():
     momentum = args.momentum
     weight_decay = args.weight_decay
     grad_clip = args.grad_clip
+    optim_type = args.optim_type
 
     start_epoch = 0
     epochs_since_improvement = 0
@@ -64,8 +66,14 @@ def main():
                     biases.append(param)
                 else:
                     not_biases.append(param)
-        optimizer = torch.optim.SGD(params=[{'params': biases, 'lr': 2 * lr}, {'params': not_biases}],
+        if optim_type == 'sgd':
+            optimizer = torch.optim.SGD(params=[{'params': biases, 'lr': 2 * lr}, {'params': not_biases}],
                                     lr=lr, momentum=momentum, weight_decay=weight_decay)
+        elif optim_type == 'adam':
+            optimizer = torch.optim.Adam(params=[{'params': biases, 'lr': 2 * lr}, {'params': not_biases}],
+                                    lr=lr, momentum=momentum, weight_decay=weight_decay)
+        else:
+            assert False, "The option --optim_type='%s' is invalid." % optim_type
 
     else:
         checkpoint = torch.load(checkpoint)
