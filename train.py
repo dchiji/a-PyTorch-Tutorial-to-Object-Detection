@@ -54,6 +54,8 @@ def main():
     best_loss = 100.
     workers = 4
 
+    print(args)
+
     # Initialize model or load checkpoint
     if checkpoint is None:
         model = SSD300(n_classes=n_classes)
